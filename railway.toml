@@ -1,0 +1,11 @@
+﻿[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "php-fpm & nginx -c /app/nginx.conf -g 'daemon off;'"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+
+[nixpacks]
+php_version = "8.3"
