@@ -4,8 +4,13 @@ nixPkgs = ['php82', 'php82Extensions.mysqli', 'nginx']
 [phases.install]
 cmds = [
   "mkdir -p /var/log/nginx",
-  "mkdir -p /var/cache/nginx"
+  "mkdir -p /var/cache/nginx",
+  "mkdir -p /var/run"
 ]
 
 [start]
-cmd = "sed -i \"s|listen 0.0.0.0:8080|listen 0.0.0.0:$PORT|g\" /app/nginx.conf && php-fpm & nginx -c /app/nginx.conf"
+cmd = """
+sed -i \"s|listen 0.0.0.0:8080|listen 0.0.0.0:$PORT|g\" /app/nginx.conf && \
+php-fpm -y /app/php-fpm.conf -c /app/php.ini & \
+nginx -c /app/nginx.conf -g 'daemon off;'
+"""
