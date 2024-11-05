@@ -1,0 +1,32 @@
+﻿[
+phases.setup
+]
+nixPkgs = [
+    "php83",
+    "php83Extensions.mysqli",
+    "php83Extensions.pdo",
+    "php83Extensions.pdo_mysql",
+    "php83Extensions.curl",
+    "php83Extensions.gd",
+    "php83Extensions.mbstring",
+    "php83Extensions.xml",
+    "php83Extensions.zip",
+    "nginx",
+    "mariadb"
+]
+
+[
+phases.install
+]
+cmds = [
+    "mkdir -p /var/log/nginx",
+    "mkdir -p /var/cache/nginx",
+    "mkdir -p /var/run",
+    "chmod -R 755 /app",
+    "chown -R nginx:nginx /app"
+]
+
+[
+start
+]
+cmd = "nginx -c /app/nginx.conf && php-fpm -F"
