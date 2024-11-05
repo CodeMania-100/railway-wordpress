@@ -8,4 +8,4 @@ cmds = [
 ]
 
 [start]
-cmd = "sed -i \"s|Listen 80|Listen $PORT|g\" /etc/apache2/httpd.conf && apache2 -D FOREGROUND"
+cmd = "apache2 -f /app/apache2.conf -DFOREGROUND"
