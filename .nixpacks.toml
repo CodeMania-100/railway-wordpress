@@ -1,11 +1,14 @@
 [phases.setup]
-nixPkgs = ['php82', 'php82Extensions.mysqli', 'apache2']
+nixPkgs = ['nginx', 'php82', 'php82Extensions.mysqli']
 
 [phases.install]
 cmds = [
-  "mkdir -p /var/log/apache2",
-  "mkdir -p /var/run/apache2"
+  "mkdir -p /var/log/nginx",
+  "mkdir -p /var/cache/nginx"
 ]
 
+[phases.build]
+cmds = "chmod -R 777 /app"
+
 [start]
-cmd = "apache2 -f /app/apache2.conf -DFOREGROUND"
+cmd = "nginx -c /app/nginx.conf"
