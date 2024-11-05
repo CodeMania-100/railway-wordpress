@@ -4,11 +4,24 @@ nixPkgs = ['nginx', 'php82', 'php82Extensions.mysqli']
 [phases.install]
 cmds = [
   "mkdir -p /var/log/nginx",
-  "mkdir -p /var/cache/nginx"
+  "mkdir -p /var/cache/nginx",
+  "mkdir -p /run"
 ]
 
-[phases.build]
-cmds = "chmod -R 777 /app"
-
 [start]
-cmd = "nginx -c /app/nginx.conf"
+cmd = """
+echo "
+[global]
+pid = /run/php-fpm.pid
+error_log = /dev/stderr
+daemonize = no
+
+[www]
+listen = 127.0.0.1:9000
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+" > /run/php-fpm.conf && php-fpm -y /run/php-fpm.conf & nginx -c /app/nginx.conf
+"""
