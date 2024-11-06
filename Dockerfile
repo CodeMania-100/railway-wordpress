@@ -10,3 +10,6 @@ RUN { \
     echo 'post_max_size = 64M'; \
     echo 'max_execution_time = 300'; \
 } > /usr/local/etc/php/conf.d/wordpress.ini
+
+# Set the entry point to Apache
+CMD ["apache2-foreground"]
