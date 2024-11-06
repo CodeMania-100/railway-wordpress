@@ -1,65 +1,13 @@
 [phases.setup]
-nixPkgs = ['nginx', 'php82', 'php82Extensions.mysqli']
+nixPkgs = ['apache2', 'php82', 'php82Extensions.mysqli']
 
 [phases.install]
 cmds = [
-  "mkdir -p /var/log/nginx",
-  "mkdir -p /var/cache/nginx",
-  "mkdir -p /run",
-  "mkdir -p /app/php",
-  "chmod -R 777 /app/php"
+  "mkdir -p /var/log/apache2",
+  "mkdir -p /var/run/apache2",
+  "a2enmod rewrite",
+  "a2enmod php"
 ]
 
-[env]
-PHP_INI_DIR = "/app/php"
-PHP_INI_SCAN_DIR = "/app/php"
-
 [start]
-cmd = """
-# Create PHP config directory and files
-mkdir -p /app/php/conf.d
-mkdir -p /app/php/pool.d
-
-# Create php-fpm.conf
-cat > /app/php/php-fpm.conf << 'EOL'
-[global]
-error_log = /dev/stderr
-daemonize = no
-include=/app/php/pool.d/*.conf
-EOL
-
-# Create www.conf pool configuration
-cat > /app/php/pool.d/www.conf << 'EOL'
-[www]
-user = nobody
-group = nobody
-listen = 127.0.0.1:9000
-pm = dynamic
-pm.max_children = 5
-pm.start_servers = 2
-pm.min_spare_servers = 1
-pm.max_spare_servers = 3
-catch_workers_output = yes
-EOL
-
-# Create PHP configuration
-cat > /app/php/php.ini << 'EOL'
-[PHP]
-short_open_tag = On
-memory_limit = 256M
-max_execution_time = 300
-upload_max_filesize = 32M
-post_max_size = 32M
-display_errors = On
-error_log = /dev/stderr
-log_errors = On
-error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
-date.timezone = UTC
-EOL
-
-# Start PHP-FPM with new configuration
-PHP_INI_DIR=/app/php PHP_INI_SCAN_DIR=/app/php php-fpm --fpm-config /app/php/php-fpm.conf & \
-# Update Nginx port and start
-sed -i "s|listen 0.0.0.0:8080|listen 0.0.0.0:$PORT|g" /app/nginx.conf && \
-nginx -c /app/nginx.conf -g 'daemon off;'
-"""
+cmd = "sed -i \"s|Listen 80|Listen ${PORT}|g\" /etc/apache2/ports.conf && apache2ctl -D FOREGROUND"
