@@ -8,4 +8,7 @@ cmds = [
 ]
 
 [start]
-cmd = "sed -i \"s|listen \$PORT|listen ${PORT}|g\" /app/nginx.conf && nginx -c /app/nginx.conf -g 'daemon off;'"
+cmd = """
+sed -i "s|listen 0.0.0.0:8080|listen 0.0.0.0:$PORT|g" /app/nginx.conf && \
+nginx -c /app/nginx.conf -g 'daemon off;'
+"""

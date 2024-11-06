@@ -1,1 +1,1 @@
-web: vendor/bin/heroku-php-apache2 -l public
+web: PORT=3000 vendor/bin/heroku-php-apache2
