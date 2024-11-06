@@ -23,5 +23,8 @@ pm.max_children = 5
 pm.start_servers = 2
 pm.min_spare_servers = 1
 pm.max_spare_servers = 3
-" > /run/php-fpm.conf && php-fpm -y /run/php-fpm.conf & nginx -c /app/nginx.conf -g 'daemon off;'
+" > /run/php-fpm.conf && \
+php-fpm -y /run/php-fpm.conf & \
+sed -i "s|listen 0.0.0.0:8080|listen 0.0.0.0:$PORT|g" /app/nginx.conf && \
+nginx -c /app/nginx.conf -g 'daemon off;'
 """
