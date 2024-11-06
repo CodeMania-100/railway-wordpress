@@ -23,8 +23,18 @@ ENV APACHE_LOCK_DIR /var/lock/apache2
 RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
     chown -R www-data:www-data /var/run/apache2 /var/lock/apache2
 
+# Copy WordPress files from default location
+RUN cp -r /usr/src/wordpress/. /var/www/html/ && \
+    chown -R www-data:www-data /var/www/html
+
 # Create start script
-RUN echo '#!/bin/bash\napache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
+RUN echo '#!/bin/bash\n\
+if [ ! -f /var/www/html/wp-config.php ]; then\n\
+    # Copy WordPress if not exists\n\
+    cp -r /usr/src/wordpress/. /var/www/html/\n\
+    chown -R www-data:www-data /var/www/html\n\
+fi\n\
+apache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
     chmod +x /usr/local/bin/docker-start.sh
 
 EXPOSE 80
