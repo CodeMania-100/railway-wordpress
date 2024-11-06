@@ -1,16 +1,9 @@
 {
-    "name": "wordpress/wordpress",
-    "description": "WordPress is open source software you can use to create a beautiful website, blog, or app.",
     "require": {
-        "php": "^8.3",
+        "php": "^8.2",
         "ext-mysqli": "*"
     },
     "require-dev": {
         "heroku/heroku-buildpack-php": "*"
-    },
-    "config": {
-        "allow-plugins": {
-            "heroku/installer-plugin": true
-        }
     }
 }
