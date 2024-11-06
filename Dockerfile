@@ -23,26 +23,9 @@ ENV APACHE_LOCK_DIR /var/lock/apache2
 RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
     chown -R www-data:www-data /var/run/apache2 /var/lock/apache2
 
-# Configure Apache
-RUN echo "ServerName railway-wordpress-production-56c1.up.railway.app" >> /etc/apache2/apache2.conf && \
-    echo "<Directory /var/www/html/>" >> /etc/apache2/apache2.conf && \
-    echo "    Options Indexes FollowSymLinks" >> /etc/apache2/apache2.conf && \
-    echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
-    echo "    Require all granted" >> /etc/apache2/apache2.conf && \
-    echo "</Directory>" >> /etc/apache2/apache2.conf
-
-# Create start script
-RUN echo '#!/bin/bash\napache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
-    chmod +x /usr/local/bin/docker-start.sh
-
-# Copy WordPress files
-COPY wp-content/ /var/www/html/wp-content/
-
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html && \
-    chmod -R 755 /var/www/html
-
 EXPOSE 80
 ENV PORT=80
 
-CMD ["/usr/local/bin/docker-start.sh"]
+# Keep original entrypoint and command
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["apache2-foreground"]
