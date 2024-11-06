@@ -38,6 +38,7 @@ RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
     echo '    chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
     echo 'fi' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
+    echo '# Create or update .htaccess' >> /usr/local/bin/docker-start.sh && \
     echo 'cat > /var/www/html/.htaccess << "EOF"' >> /usr/local/bin/docker-start.sh && \
     echo '# BEGIN WordPress' >> /usr/local/bin/docker-start.sh && \
     echo '<IfModule mod_rewrite.c>' >> /usr/local/bin/docker-start.sh && \
@@ -51,7 +52,11 @@ RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
     echo '# END WordPress' >> /usr/local/bin/docker-start.sh && \
     echo 'EOF' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
+    echo '# Ensure proper permissions' >> /usr/local/bin/docker-start.sh && \
     echo 'chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
+    echo 'find /var/www/html -type d -exec chmod 755 {} \;' >> /usr/local/bin/docker-start.sh && \
+    echo 'find /var/www/html -type f -exec chmod 644 {} \;' >> /usr/local/bin/docker-start.sh && \
+    echo '' >> /usr/local/bin/docker-start.sh && \
     echo 'apache2 -DFOREGROUND' >> /usr/local/bin/docker-start.sh && \
     chmod +x /usr/local/bin/docker-start.sh
 
