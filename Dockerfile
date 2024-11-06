@@ -16,8 +16,12 @@ RUN { \
 RUN a2enmod rewrite
 
 # Update Apache configuration
-RUN sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/sites-available/000-default.conf && \
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
+    sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/sites-available/000-default.conf && \
     sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/ports.conf
+
+# Copy WordPress files
+COPY . /var/www/html/
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
@@ -34,7 +38,8 @@ RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
     chown -R www-data:www-data /var/run/apache2 /var/lock/apache2
 
 # Create start script
-RUN echo '#!/bin/bash\napache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
+RUN echo '#!/bin/bash\n\
+apache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
     chmod +x /usr/local/bin/docker-start.sh
 
 EXPOSE 80
