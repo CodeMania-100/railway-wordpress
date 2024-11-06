@@ -11,6 +11,18 @@ RUN { \
     echo 'max_execution_time = 300'; \
 } > /usr/local/etc/php/conf.d/wordpress.ini
 
+# Set Apache environment variables
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_PID_FILE /var/run/apache2/apache2.pid
+ENV APACHE_RUN_DIR /var/run/apache2
+ENV APACHE_LOCK_DIR /var/lock/apache2
+
+# Create necessary directories
+RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
+    chown -R www-data:www-data /var/run/apache2 /var/lock/apache2
+
 # Create start script
 RUN echo '#!/bin/bash\napache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
     chmod +x /usr/local/bin/docker-start.sh
