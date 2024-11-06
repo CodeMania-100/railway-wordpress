@@ -1,14 +1,14 @@
 FROM wordpress:6.4-php8.2-apache
 
-# Enable Apache modules
-RUN a2enmod rewrite
-RUN a2enmod headers
-
-# Configure PHP
-RUN echo "memory_limit = 256M" > /usr/local/etc/php/conf.d/wordpress.ini && \
-    echo "upload_max_filesize = 64M" >> /usr/local/etc/php/conf.d/wordpress.ini && \
-    echo "post_max_size = 64M" >> /usr/local/etc/php/conf.d/wordpress.ini && \
-    echo "max_execution_time = 300" >> /usr/local/etc/php/conf.d/wordpress.ini
+# Install and configure Apache modules
+RUN a2enmod rewrite headers ssl && \
+    # Configure PHP
+    echo "\
+memory_limit = 256M\n\
+upload_max_filesize = 64M\n\
+post_max_size = 64M\n\
+max_execution_time = 300\
+" > /usr/local/etc/php/conf.d/wordpress.ini
 
 # Set Apache environment variables
 ENV APACHE_RUN_USER=www-data \
@@ -16,54 +16,63 @@ ENV APACHE_RUN_USER=www-data \
     APACHE_LOG_DIR=/var/log/apache2 \
     APACHE_PID_FILE=/var/run/apache2/apache2.pid \
     APACHE_RUN_DIR=/var/run/apache2 \
-    APACHE_LOCK_DIR=/var/lock/apache2
+    APACHE_LOCK_DIR=/var/lock/apache2 \
+    PORT=80
 
-# Create necessary directories
+# Create necessary directories and set permissions
 RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
-    chown -R www-data:www-data /var/run/apache2 /var/lock/apache2
+    chown -R www-data:www-data /var/run/apache2 /var/lock/apache2 /var/www/html
 
-# Configure Apache
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
-    echo "<Directory /var/www/html/>" >> /etc/apache2/apache2.conf && \
-    echo "    Options Indexes FollowSymLinks" >> /etc/apache2/apache2.conf && \
-    echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
-    echo "    Require all granted" >> /etc/apache2/apache2.conf && \
-    echo "</Directory>" >> /etc/apache2/apache2.conf
+# Configure Apache with heredoc syntax
+RUN cat >> /etc/apache2/apache2.conf << 'EOL'
+ServerName localhost
 
-# Create start script
-RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo 'if [ ! -f /var/www/html/wp-config.php ]; then' >> /usr/local/bin/docker-start.sh && \
-    echo '    cp -r /usr/src/wordpress/* /var/www/html/' >> /usr/local/bin/docker-start.sh && \
-    echo '    chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
-    echo 'fi' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Create or update .htaccess' >> /usr/local/bin/docker-start.sh && \
-    echo 'cat > /var/www/html/.htaccess << "EOF"' >> /usr/local/bin/docker-start.sh && \
-    echo '# BEGIN WordPress' >> /usr/local/bin/docker-start.sh && \
-    echo '<IfModule mod_rewrite.c>' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteEngine On' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteBase /' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteRule ^index\.php$ - [L]' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteCond %{REQUEST_FILENAME} !-f' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteCond %{REQUEST_FILENAME} !-d' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteRule . /index.php [L]' >> /usr/local/bin/docker-start.sh && \
-    echo '</IfModule>' >> /usr/local/bin/docker-start.sh && \
-    echo '# END WordPress' >> /usr/local/bin/docker-start.sh && \
-    echo 'EOF' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Ensure proper permissions' >> /usr/local/bin/docker-start.sh && \
-    echo 'chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
-    echo 'find /var/www/html -type d -exec chmod 755 {} \;' >> /usr/local/bin/docker-start.sh && \
-    echo 'find /var/www/html -type f -exec chmod 644 {} \;' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo 'apache2 -DFOREGROUND' >> /usr/local/bin/docker-start.sh && \
-    chmod +x /usr/local/bin/docker-start.sh
+<Directory /var/www/html/>
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html
+<IfModule mod_ssl.c>
+    SetEnvIf X-Forwarded-Proto https HTTPS=on
+</IfModule>
+EOL
+
+# Create start script with heredoc syntax
+RUN cat > /usr/local/bin/docker-start.sh << 'EOL'
+#!/bin/bash
+
+if [ ! -f /var/www/html/wp-config.php ]; then
+    cp -r /usr/src/wordpress/* /var/www/html/
+    chown -R www-data:www-data /var/www/html
+fi
+
+# Create or update .htaccess
+cat > /var/www/html/.htaccess << 'EOF'
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+EOF
+
+# Set proper permissions
+chown -R www-data:www-data /var/www/html
+find /var/www/html -type d -exec chmod 755 {} \;
+find /var/www/html -type f -exec chmod 644 {} \;
+
+exec apache2-foreground
+EOL
+
+RUN chmod +x /usr/local/bin/docker-start.sh
 
 EXPOSE 80
-ENV PORT=80
 
 CMD ["/usr/local/bin/docker-start.sh"]
