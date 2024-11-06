@@ -31,30 +31,28 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
     echo "</Directory>" >> /etc/apache2/apache2.conf
 
 # Create start script
-RUN echo '#!/bin/bash
-
-# Create wp-config.php if it doesnt exist
-if [ ! -f /var/www/html/wp-config.php ]; then
-    cp -r /usr/src/wordpress/* /var/www/html/
-    chown -R www-data:www-data /var/www/html
-fi
-
-# Create or update .htaccess
-cat > /var/www/html/.htaccess << "EOF"
-# BEGIN WordPress
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteBase /
-RewriteRule ^index\.php$ - [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.php [L]
-</IfModule>
-# END WordPress
-EOF
-
-chown -R www-data:www-data /var/www/html
-apache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
+RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
+    echo '' >> /usr/local/bin/docker-start.sh && \
+    echo 'if [ ! -f /var/www/html/wp-config.php ]; then' >> /usr/local/bin/docker-start.sh && \
+    echo '    cp -r /usr/src/wordpress/* /var/www/html/' >> /usr/local/bin/docker-start.sh && \
+    echo '    chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
+    echo 'fi' >> /usr/local/bin/docker-start.sh && \
+    echo '' >> /usr/local/bin/docker-start.sh && \
+    echo 'cat > /var/www/html/.htaccess << "EOF"' >> /usr/local/bin/docker-start.sh && \
+    echo '# BEGIN WordPress' >> /usr/local/bin/docker-start.sh && \
+    echo '<IfModule mod_rewrite.c>' >> /usr/local/bin/docker-start.sh && \
+    echo 'RewriteEngine On' >> /usr/local/bin/docker-start.sh && \
+    echo 'RewriteBase /' >> /usr/local/bin/docker-start.sh && \
+    echo 'RewriteRule ^index\.php$ - [L]' >> /usr/local/bin/docker-start.sh && \
+    echo 'RewriteCond %{REQUEST_FILENAME} !-f' >> /usr/local/bin/docker-start.sh && \
+    echo 'RewriteCond %{REQUEST_FILENAME} !-d' >> /usr/local/bin/docker-start.sh && \
+    echo 'RewriteRule . /index.php [L]' >> /usr/local/bin/docker-start.sh && \
+    echo '</IfModule>' >> /usr/local/bin/docker-start.sh && \
+    echo '# END WordPress' >> /usr/local/bin/docker-start.sh && \
+    echo 'EOF' >> /usr/local/bin/docker-start.sh && \
+    echo '' >> /usr/local/bin/docker-start.sh && \
+    echo 'chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
+    echo 'apache2 -DFOREGROUND' >> /usr/local/bin/docker-start.sh && \
     chmod +x /usr/local/bin/docker-start.sh
 
 # Set permissions
