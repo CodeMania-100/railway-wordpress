@@ -13,9 +13,11 @@ RUN { \
 
 # Create start script
 RUN echo '#!/bin/bash\n\
-sed -i "s/80/$PORT/g" /etc/apache2/ports.conf /etc/apache2/sites-available/*.conf\n\
-docker-entrypoint.sh apache2-foreground' > /usr/local/bin/start.sh && \
+apache2ctl -D FOREGROUND' > /usr/local/bin/start.sh && \
     chmod +x /usr/local/bin/start.sh
+
+# Configure Apache
+RUN sed -i "s/80/\${PORT}/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
@@ -24,4 +26,4 @@ RUN chown -R www-data:www-data /var/www/html && \
 EXPOSE 80
 ENV PORT=80
 
-CMD ["/usr/local/bin/start.sh"]
+USER www-data
