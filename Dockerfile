@@ -6,11 +6,11 @@ RUN a2enmod headers
 
 # Configure PHP
 RUN { \
-    echo 'memory_limit = 256M'; \
-    echo 'upload_max_filesize = 64M'; \
-    echo 'post_max_size = 64M'; \
-    echo 'max_execution_time = 300'; \
-    echo 'post_max_size = 64M'; \
+    echo ''memory_limit = 256M''; \
+    echo ''upload_max_filesize = 64M''; \
+    echo ''post_max_size = 64M''; \
+    echo ''max_execution_time = 300''; \
+    echo ''post_max_size = 64M''; \
 } > /usr/local/etc/php/conf.d/wordpress.ini
 
 # Set Apache environment variables
@@ -27,14 +27,14 @@ RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
 
 # Configure Apache
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
-    echo '<Directory /var/www/html/>' >> /etc/apache2/apache2.conf && \
-    echo '    Options Indexes FollowSymLinks' >> /etc/apache2/apache2.conf && \
-    echo '    AllowOverride All' >> /etc/apache2/apache2.conf && \
-    echo '    Require all granted' >> /etc/apache2/apache2.conf && \
-    echo '</Directory>' >> /etc/apache2/apache2.conf
+    echo ''<Directory /var/www/html/>'' >> /etc/apache2/apache2.conf && \
+    echo ''    Options Indexes FollowSymLinks'' >> /etc/apache2/apache2.conf && \
+    echo ''    AllowOverride All'' >> /etc/apache2/apache2.conf && \
+    echo ''    Require all granted'' >> /etc/apache2/apache2.conf && \
+    echo ''</Directory>'' >> /etc/apache2/apache2.conf
 
 # Create start script
-RUN echo '#!/bin/bash\n\
+RUN echo ''#!/bin/bash\n\
 \n\
 # Create wp-config.php if it doesnt exist\n\
 if [ ! -f /var/www/html/wp-config.php ]; then\n\
@@ -55,7 +55,7 @@ RewriteRule . /index.php [L]\n\
 # END WordPress" > /var/www/html/.htaccess\n\
 \n\
 chown -R www-data:www-data /var/www/html\n\
-apache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
+apache2 -DFOREGROUND'' > /usr/local/bin/docker-start.sh && \
     chmod +x /usr/local/bin/docker-start.sh
 
 # Set permissions
