@@ -1,1 +1,0 @@
-web: PORT=3000 vendor/bin/heroku-php-apache2

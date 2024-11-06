@@ -1,6 +1,8 @@
-﻿wp-content/uploads/
-wp-content/cache/
-wp-content/upgrade/
-.env
-.DS_Store
-*.log
+wp-config.php
+wp-content/uploads/*
+wp-content/cache/*
+wp-content/upgrade/*
+wp-content/backup-db/*
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/blogs.dir/
