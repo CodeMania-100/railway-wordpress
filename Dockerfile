@@ -23,9 +23,11 @@ ENV APACHE_LOCK_DIR /var/lock/apache2
 RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
     chown -R www-data:www-data /var/run/apache2 /var/lock/apache2
 
+# Create start script
+RUN echo '#!/bin/bash\napache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
+    chmod +x /usr/local/bin/docker-start.sh
+
 EXPOSE 80
 ENV PORT=80
 
-# Keep original entrypoint and command
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["apache2-foreground"]
+CMD ["/usr/local/bin/docker-start.sh"]
