@@ -1,8 +1,9 @@
 FROM wordpress:6.4-php8.2-apache
 
-# Remove any existing CMD or ENTRYPOINT
-ENTRYPOINT []
-CMD []
+# Enable Apache modules
+RUN a2enmod rewrite
+RUN a2enmod ssl
+RUN a2enmod headers
 
 # Configure PHP
 RUN { \
@@ -12,35 +13,26 @@ RUN { \
     echo 'max_execution_time = 300'; \
 } > /usr/local/etc/php/conf.d/wordpress.ini
 
-# Set up Apache
-RUN a2enmod rewrite
-
-# Update Apache configuration
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
-    sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/sites-available/000-default.conf && \
-    sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/ports.conf
-
-# Copy WordPress files
-COPY . /var/www/html/
+# Create start script with HTTPS configurations
+RUN echo '#!/bin/bash\n\
+# Add HTTPS headers\n\
+cat > /etc/apache2/conf-available/security.conf << EOL\n\
+Header set Content-Security-Policy "upgrade-insecure-requests"\n\
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"\n\
+EOL\n\
+\n\
+a2enconf security\n\
+\n\
+# Update WordPress URLs to HTTPS\n\
+sed -i "s/http:\/\//https:\/\//g" /var/www/html/wp-includes/js/*.js\n\
+sed -i "s/http:\/\//https:\/\//g" /var/www/html/wp-includes/css/*.css\n\
+\n\
+apache2 -D FOREGROUND' > /usr/local/bin/docker-start.sh && \
+    chmod +x /usr/local/bin/docker-start.sh
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
-
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-ENV APACHE_LOG_DIR /var/log/apache2
-ENV APACHE_PID_FILE /var/run/apache2/apache2.pid
-ENV APACHE_RUN_DIR /var/run/apache2
-ENV APACHE_LOCK_DIR /var/lock/apache2
-
-RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
-    chown -R www-data:www-data /var/run/apache2 /var/lock/apache2
-
-# Create start script
-RUN echo '#!/bin/bash\n\
-apache2 -DFOREGROUND' > /usr/local/bin/docker-start.sh && \
-    chmod +x /usr/local/bin/docker-start.sh
 
 EXPOSE 80
 ENV PORT=80
