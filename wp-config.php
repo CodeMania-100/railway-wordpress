@@ -1,8 +1,15 @@
-// ** Database settings - You can get this info from your web host ** //
-define( 'DB_NAME', getenv('DB_NAME') );
-define( 'DB_USER', getenv('DB_USER') );
-define( 'DB_PASSWORD', getenv('DB_PASSWORD') );
-define( 'DB_HOST', getenv('DB_HOST') );
+<?php $table_prefix = getenv('WORDPRESS_TABLE_PREFIX') ?: 'wp2_';
+
+// Force these settings
+define('WORDPRESS_DB_HOST', getenv('MYSQLHOST'));
+define('WORDPRESS_DB_NAME', getenv('MYSQL_DATABASE'));
+define('WORDPRESS_DB_USER', getenv('MYSQLUSER'));
+define('WORDPRESS_DB_PASSWORD', getenv('MYSQLPASSWORD'));
+
+// Enable debugging
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+define('WP_DEBUG_DISPLAY', true);
 
 // Generate these using https://api.wordpress.org/secret-key/1.1/salt/
 define('AUTH_KEY',         getenv('AUTH_KEY'));
