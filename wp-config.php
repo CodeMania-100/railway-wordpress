@@ -39,4 +39,11 @@ define('ALLOW_UNFILTERED_UPLOADS', true);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST']);
+define('ADMIN_COOKIE_PATH', '/');
+define('COOKIEPATH', '/');
+define('SITECOOKIEPATH', '/');
+
+
+
 require_once(ABSPATH . 'wp-settings.php');

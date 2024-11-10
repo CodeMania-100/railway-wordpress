@@ -3,6 +3,14 @@
 RewriteEngine On
 RewriteBase /
 RewriteRule ^index\.php$ - [L]
+
+# Add these lines
+RewriteCond %{REQUEST_URI} ^/(wp-admin/.*)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /wp-admin/$1 [L]
+
+# Existing rules
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
