@@ -1,4 +1,13 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+define('WP_DEBUG', true);
+
+// Add this debugging information
+echo "Current user: ";
+var_dump(wp_get_current_user());
+echo "User roles: ";
+var_dump(wp_get_current_user()->roles);
 /**
  * Dashboard Administration Screen
  *
