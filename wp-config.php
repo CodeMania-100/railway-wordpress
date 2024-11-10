@@ -41,6 +41,23 @@ define('NONCE_SALT',       getenv('NONCE_SALT'));
 define('AUTOMATIC_UPDATER_DISABLED', true);
 define('WP_AUTO_UPDATE_CORE', false);
 
+// Force HTTPS for admin
+define('FORCE_SSL_ADMIN', true);
+
+// Set specific cookie settings
+define('ADMIN_COOKIE_PATH', '/');
+define('COOKIE_DOMAIN', '');
+define('COOKIEPATH', '/');
+define('SITECOOKIEPATH', '/');
+
+// Force WordPress Address and Site Address
+define('WP_HOME', 'https://railway-wordpress-production-56c1.up.railway.app');
+define('WP_SITEURL', 'https://railway-wordpress-production-56c1.up.railway.app');
+
+// Additional security
+define('DISALLOW_FILE_EDIT', false);
+define('WP_HTTP_BLOCK_EXTERNAL', false);
+
 /* That's all, stop editing! Happy publishing. */
 
 /** Absolute path to the WordPress directory. */
