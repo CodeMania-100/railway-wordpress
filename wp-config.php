@@ -12,6 +12,11 @@ define('WP_DEBUG', true);
 define('WP_DEBUG_LOG', true);
 define('WP_DEBUG_DISPLAY', false);
 
+// Handle reverse proxy properly
+if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+    $list = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+    $_SERVER['REMOTE_ADDR'] = trim($list[0]);
+}
 define('FORCE_SSL_ADMIN', true);
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
     $_SERVER['HTTPS'] = 'on';
@@ -43,6 +48,8 @@ define('COOKIE_DOMAIN', $_SERVER['HTTP_HOST']);
 define('ADMIN_COOKIE_PATH', '/');
 define('COOKIEPATH', '/');
 define('SITECOOKIEPATH', '/');
+define('WP_ADMIN_DIR', 'wp-admin');
+define('ADMIN_COOKIE_PATH', SITECOOKIEPATH . 'wp-admin');
 
 
 

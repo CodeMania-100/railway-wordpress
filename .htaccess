@@ -2,17 +2,32 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
+
+# Allow direct access to wp-admin directory
+RewriteCond %{REQUEST_URI} ^/wp-admin
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Handle wp-admin access
+RewriteRule ^wp-admin/$ wp-admin/index.php [L]
+
+# WordPress standard rules
 RewriteRule ^index\.php$ - [L]
-
-# Add these lines
-RewriteCond %{REQUEST_URI} ^/(wp-admin/.*)
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /wp-admin/$1 [L]
-
-# Existing rules
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
 # END WordPress
+
+# Allow access to wp-admin directory
+<Directory "/wp-admin">
+    Order allow,deny
+    Allow from all
+</Directory>
+
+# Prevent direct access to PHP files (except index.php)
+<FilesMatch "\.php$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
