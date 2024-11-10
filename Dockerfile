@@ -1,9 +1,7 @@
 FROM wordpress:6.4-php8.2-apache
 
 # Enable Apache modules
-
 RUN a2enmod rewrite headers ssl
-
 
 # Configure PHP
 RUN echo "memory_limit = 256M" > /usr/local/etc/php/conf.d/wordpress.ini && \
