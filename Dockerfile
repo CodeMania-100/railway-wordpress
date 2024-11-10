@@ -21,15 +21,13 @@ ENV APACHE_RUN_USER=www-data \
 RUN mkdir -p /var/run/apache2 /var/lock/apache2 && \
     chown -R www-data:www-data /var/run/apache2 /var/lock/apache2
 
-# Configure Apache
-RUN cat << 'EOL' >> /etc/apache2/apache2.conf
-ServerName localhost
-
-<Directory /var/www/html/>
-    AllowOverride All
-    Require all granted
-</Directory>
-EOL
+# Configure Apache (using echo instead of heredoc)
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
+    echo "" >> /etc/apache2/apache2.conf && \
+    echo "<Directory /var/www/html/>" >> /etc/apache2/apache2.conf && \
+    echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
+    echo "    Require all granted" >> /etc/apache2/apache2.conf && \
+    echo "</Directory>" >> /etc/apache2/apache2.conf
 
 # Add SSL configuration
 RUN echo "<IfModule mod_ssl.c>" >> /etc/apache2/apache2.conf && \
