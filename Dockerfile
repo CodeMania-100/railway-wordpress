@@ -51,20 +51,21 @@ RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
     echo 'echo "Current files in /var/www/html:"' >> /usr/local/bin/docker-start.sh && \
     echo 'ls -la /var/www/html/' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Create or update .htaccess' >> /usr/local/bin/docker-start.sh && \
+
+    # Create or update .htaccess
+    echo '# Create or update .htaccess' >> /usr/local/bin/docker-start.sh && \    
     echo 'cat > /var/www/html/.htaccess << "EOF"' >> /usr/local/bin/docker-start.sh && \
     echo '# BEGIN WordPress' >> /usr/local/bin/docker-start.sh && \
     echo '<IfModule mod_rewrite.c>' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteEngine On' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteBase /' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
+    echo '# Handle wp-admin first' >> /usr/local/bin/docker-start.sh && \
+    echo 'RewriteRule ^wp-admin/$ wp-admin/index.php [L]' >> /usr/local/bin/docker-start.sh && \
+    echo '' >> /usr/local/bin/docker-start.sh && \
     echo '# Handle HTTPS redirect' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteCond %{HTTP:X-Forwarded-Proto} !https' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Allow direct access to wp-admin directory' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteRule ^wp-admin/$ wp-admin/index.php [L]' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteRule ^wp-admin/(.*\.php)$ wp-admin/$1 [L]' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
     echo '# Standard WordPress rules' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteRule ^index\.php$ - [L]' >> /usr/local/bin/docker-start.sh && \
@@ -73,14 +74,11 @@ RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
     echo 'RewriteRule . /index.php [L]' >> /usr/local/bin/docker-start.sh && \
     echo '</IfModule>' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Additional security for wp-admin' >> /usr/local/bin/docker-start.sh && \
-    echo '<Files "wp-login.php">' >> /usr/local/bin/docker-start.sh && \
-    echo '    Require all granted' >> /usr/local/bin/docker-start.sh && \
+    echo '# Extra wp-admin protection' >> /usr/local/bin/docker-start.sh && \
+    echo '<Files wp-admin/*>' >> /usr/local/bin/docker-start.sh && \
+    echo '  Order Deny,Allow' >> /usr/local/bin/docker-start.sh && \
+    echo '  Allow from all' >> /usr/local/bin/docker-start.sh && \
     echo '</Files>' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '<Directory "/var/www/html/wp-admin">' >> /usr/local/bin/docker-start.sh && \
-    echo '    Require all granted' >> /usr/local/bin/docker-start.sh && \
-    echo '</Directory>' >> /usr/local/bin/docker-start.sh && \
     echo '# END WordPress' >> /usr/local/bin/docker-start.sh && \
     echo 'EOF' >> /usr/local/bin/docker-start.sh
 
