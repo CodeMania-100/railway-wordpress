@@ -30,12 +30,8 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
     echo "</Directory>" >> /etc/apache2/apache2.conf && \
     echo "" >> /etc/apache2/apache2.conf && \
     echo "<Directory /var/www/html/wp-admin/>" >> /etc/apache2/apache2.conf && \
-    echo "    Options -Indexes +FollowSymLinks" >> /etc/apache2/apache2.conf && \
     echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
     echo "    Require all granted" >> /etc/apache2/apache2.conf && \
-    echo "    <Files ~ \"\.php$\">" >> /etc/apache2/apache2.conf && \
-    echo "        Require all granted" >> /etc/apache2/apache2.conf && \
-    echo "    </Files>" >> /etc/apache2/apache2.conf && \
     echo "</Directory>" >> /etc/apache2/apache2.conf
 
 # Add SSL configuration
