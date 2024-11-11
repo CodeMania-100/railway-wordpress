@@ -37,10 +37,14 @@ RUN echo "<IfModule mod_ssl.c>" >> /etc/apache2/apache2.conf && \
 # Create start script
 RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
+    echo '# Copy WordPress files if wp-config.php does not exist' >> /usr/local/bin/docker-start.sh && \
     echo 'if [ ! -f /var/www/html/wp-config.php ]; then' >> /usr/local/bin/docker-start.sh && \
-    echo '    cp -r /usr/src/wordpress/* /var/www/html/' >> /usr/local/bin/docker-start.sh && \
-    echo '    chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
+    echo '    cp -rn /usr/src/wordpress/* /var/www/html/' >> /usr/local/bin/docker-start.sh && \
     echo 'fi' >> /usr/local/bin/docker-start.sh && \
+    echo '' >> /usr/local/bin/docker-start.sh && \
+    echo '# List contents for debugging' >> /usr/local/bin/docker-start.sh && \
+    echo 'echo "Current files in /var/www/html:"' >> /usr/local/bin/docker-start.sh && \
+    echo 'ls -la /var/www/html/' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
     echo '# Create or update .htaccess' >> /usr/local/bin/docker-start.sh && \
     echo 'cat > /var/www/html/.htaccess << "EOF"' >> /usr/local/bin/docker-start.sh && \
@@ -63,6 +67,7 @@ RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
     echo 'find /var/www/html -type d -exec chmod 755 {} \;' >> /usr/local/bin/docker-start.sh && \
     echo 'find /var/www/html -type f -exec chmod 644 {} \;' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
+    echo '# Start Apache' >> /usr/local/bin/docker-start.sh && \
     echo 'apache2 -DFOREGROUND' >> /usr/local/bin/docker-start.sh && \
     chmod +x /usr/local/bin/docker-start.sh
 
