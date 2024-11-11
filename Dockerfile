@@ -1,7 +1,7 @@
 FROM wordpress:6.4-php8.2-apache
 
 # Enable Apache modules
-RUN a2enmod rewrite headers ssl proxy proxy_http remoteip
+RUN a2enmod rewrite headers ssl
 
 # Configure PHP
 RUN echo "memory_limit = 256M" > /usr/local/etc/php/conf.d/wordpress.ini && \
@@ -27,11 +27,6 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
     echo "<Directory /var/www/html/>" >> /etc/apache2/apache2.conf && \
     echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
     echo "    Require all granted" >> /etc/apache2/apache2.conf && \
-    echo "</Directory>" >> /etc/apache2/apache2.conf && \
-    echo "" >> /etc/apache2/apache2.conf && \
-    echo "<Directory /var/www/html/wp-admin/>" >> /etc/apache2/apache2.conf && \
-    echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
-    echo "    Require all granted" >> /etc/apache2/apache2.conf && \
     echo "</Directory>" >> /etc/apache2/apache2.conf
 
 # Add SSL configuration
@@ -51,36 +46,30 @@ RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
     echo 'echo "Current files in /var/www/html:"' >> /usr/local/bin/docker-start.sh && \
     echo 'ls -la /var/www/html/' >> /usr/local/bin/docker-start.sh && \
     echo '' >> /usr/local/bin/docker-start.sh && \
-
-    # Create or update .htaccess
-    echo '# Create or update .htaccess' >> /usr/local/bin/docker-start.sh && \    
+    echo '# Create or update .htaccess' >> /usr/local/bin/docker-start.sh && \
     echo 'cat > /var/www/html/.htaccess << "EOF"' >> /usr/local/bin/docker-start.sh && \
     echo '# BEGIN WordPress' >> /usr/local/bin/docker-start.sh && \
     echo '<IfModule mod_rewrite.c>' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteEngine On' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteBase /' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Handle wp-admin first' >> /usr/local/bin/docker-start.sh && \
-    echo 'RewriteRule ^wp-admin/$ wp-admin/index.php [L]' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Handle HTTPS redirect' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteCond %{HTTP:X-Forwarded-Proto} !https' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Standard WordPress rules' >> /usr/local/bin/docker-start.sh && \
+    echo 'RewriteBase /' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteRule ^index\.php$ - [L]' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteCond %{REQUEST_FILENAME} !-f' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteCond %{REQUEST_FILENAME} !-d' >> /usr/local/bin/docker-start.sh && \
     echo 'RewriteRule . /index.php [L]' >> /usr/local/bin/docker-start.sh && \
     echo '</IfModule>' >> /usr/local/bin/docker-start.sh && \
-    echo '' >> /usr/local/bin/docker-start.sh && \
-    echo '# Extra wp-admin protection' >> /usr/local/bin/docker-start.sh && \
-    echo '<Files wp-admin/*>' >> /usr/local/bin/docker-start.sh && \
-    echo '  Order Deny,Allow' >> /usr/local/bin/docker-start.sh && \
-    echo '  Allow from all' >> /usr/local/bin/docker-start.sh && \
-    echo '</Files>' >> /usr/local/bin/docker-start.sh && \
     echo '# END WordPress' >> /usr/local/bin/docker-start.sh && \
-    echo 'EOF' >> /usr/local/bin/docker-start.sh
+    echo 'EOF' >> /usr/local/bin/docker-start.sh && \
+    echo '' >> /usr/local/bin/docker-start.sh && \
+    echo '# Ensure proper permissions' >> /usr/local/bin/docker-start.sh && \
+    echo 'chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
+    echo 'find /var/www/html -type d -exec chmod 755 {} \;' >> /usr/local/bin/docker-start.sh && \
+    echo 'find /var/www/html -type f -exec chmod 644 {} \;' >> /usr/local/bin/docker-start.sh && \
+    echo '' >> /usr/local/bin/docker-start.sh && \
+    echo '# Start Apache' >> /usr/local/bin/docker-start.sh && \
+    echo 'apache2 -DFOREGROUND' >> /usr/local/bin/docker-start.sh && \
+    chmod +x /usr/local/bin/docker-start.sh
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
