@@ -24,8 +24,7 @@ define('WP_HOME', 'https://railway-wordpress-production-56c1.up.railway.app');
 define('WP_SITEURL', 'https://railway-wordpress-production-56c1.up.railway.app');
 
 // SSL and cookie settings
-define('FORCE_SSL_ADMIN', true);
-define('COOKIE_DOMAIN', '');  // Leave empty to allow all domains
+define('FORCE_SSL_ADMIN', true);// Leave empty to allow all domains
 define('COOKIEPATH', '/');
 define('SITECOOKIEPATH', '/');
 define('ADMIN_COOKIE_PATH', '/wp-admin');
@@ -52,18 +51,14 @@ if (!defined('ABSPATH')) {
     define('ABSPATH', dirname(__FILE__) . '/');
 }
 // Force admin SSL but allow flexible SSL detection
-define('FORCE_SSL_ADMIN', true);
 if (strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false) {
     $_SERVER['HTTPS']='on';
-    define('FORCE_SSL_ADMIN',true);
-    define('FORCE_SSL_LOGIN',true);
+    
 }
 
 // Set cookie domain and path explicitly
 define('COOKIE_DOMAIN', '');
-define('COOKIEPATH', '/');
-define('SITECOOKIEPATH', '/');
-define('ADMIN_COOKIE_PATH', '/wp-admin');
+
 
 // Allow direct file system access
 
