@@ -90,9 +90,9 @@ RUN echo '#!/bin/bash' > /usr/local/bin/docker-start.sh && \
     echo 'chown -R www-data:www-data /var/www/html' >> /usr/local/bin/docker-start.sh && \
     echo 'find /var/www/html -type d -exec chmod 755 {} \;' >> /usr/local/bin/docker-start.sh && \
     echo 'find /var/www/html -type f -exec chmod 644 {} \;' >> /usr/local/bin/docker-start.sh && \
-    echo 'chmod 755 /var/www/html/wp-admin' >> /usr/local/bin/docker-start.sh
-    echo 'find /var/www/html/wp-admin -type d -exec chmod 755 {} \;' >> /usr/local/bin/docker-start.sh
-    echo 'find /var/www/html/wp-admin -type f -exec chmod 644 {} \;' >> /usr/local/bin/docker-start.sh
+    echo 'chmod 755 /var/www/html/wp-admin' >> /usr/local/bin/docker-start.sh \
+    echo 'find /var/www/html/wp-admin -type d -exec chmod 755 {} \;' >> /usr/local/bin/docker-start.sh \
+    echo 'find /var/www/html/wp-admin -type f -exec chmod 644 {} \;' >> /usr/local/bin/docker-start.sh \
     echo '' >> /usr/local/bin/docker-start.sh && \
     echo '# Start Apache' >> /usr/local/bin/docker-start.sh && \
     echo 'apache2 -DFOREGROUND' >> /usr/local/bin/docker-start.sh && \
