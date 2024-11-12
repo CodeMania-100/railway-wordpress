@@ -1,26 +1,28 @@
 # BEGIN WordPress
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /
+RewriteEngine On
+RewriteBase /
 
-    # Force HTTPS
-    RewriteCond %{HTTP:X-Forwarded-Proto} !https
-    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Allow direct access to wp-admin
+RewriteCond %{REQUEST_URI} ^/wp-admin/?.*$
+RewriteCond %{QUERY_STRING} !.*no-access.*
+RewriteRule ^(.*)$ - [L]
 
-    # Handle wp-admin access
-    RewriteRule ^wp-admin/$ wp-admin/index.php [L]
+# Handle HTTPS
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-    # Standard WordPress rules
-    RewriteRule ^index\.php$ - [L]
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /index.php [L]
+# Standard WordPress rules
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
 </IfModule>
 
-# Extra security for wp-admin directory
+# Protect wp-admin directory
 <Directory "/var/www/html/wp-admin">
-    Order allow,deny
-    Allow from all
+    Options -Indexes +FollowSymLinks
+    AllowOverride All
     Require all granted
 </Directory>
 # END WordPress

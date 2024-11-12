@@ -51,5 +51,28 @@ define('DISABLE_WP_CRON', true);
 if (!defined('ABSPATH')) {
     define('ABSPATH', dirname(__FILE__) . '/');
 }
+// Force admin SSL but allow flexible SSL detection
+define('FORCE_SSL_ADMIN', true);
+if (strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false) {
+    $_SERVER['HTTPS']='on';
+    define('FORCE_SSL_ADMIN',true);
+    define('FORCE_SSL_LOGIN',true);
+}
+
+// Set cookie domain and path explicitly
+define('COOKIE_DOMAIN', '');
+define('COOKIEPATH', '/');
+define('SITECOOKIEPATH', '/');
+define('ADMIN_COOKIE_PATH', '/wp-admin');
+
+// Allow direct file system access
+
+define('WP_TEMP_DIR', ABSPATH . 'wp-content/temp');
+
+
+// Additional security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: SAMEORIGIN');
+header('X-XSS-Protection: 1; mode=block');
 
 require_once(ABSPATH . 'wp-settings.php');

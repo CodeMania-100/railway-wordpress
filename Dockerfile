@@ -11,7 +11,7 @@ RUN echo "memory_limit = 256M" > /usr/local/etc/php/conf.d/wordpress.ini && \
 RUN echo "max_input_vars = 3000" >> /usr/local/etc/php/conf.d/wordpress.ini && \
     echo "max_input_time = 60" >> /usr/local/etc/php/conf.d/wordpress.ini && \
     echo "session.gc_maxlifetime = 3600" >> /usr/local/etc/php/conf.d/wordpress.ini
-    
+
 # Set Apache environment variables
 ENV APACHE_RUN_USER=www-data \
     APACHE_RUN_GROUP=www-data \
@@ -37,6 +37,18 @@ RUN echo "<Directory /var/www/html/wp-admin/>" >> /etc/apache2/apache2.conf && \
     echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
     echo "    Require all granted" >> /etc/apache2/apache2.conf && \
     echo "</Directory>" >> /etc/apache2/apache2.conf
+
+RUN echo "# Allow wp-admin access" >> /etc/apache2/apache2.conf && \
+    echo "<LocationMatch \"^/wp-admin\">" >> /etc/apache2/apache2.conf && \
+    echo "    Require all granted" >> /etc/apache2/apache2.conf && \
+    echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
+    echo "    Order allow,deny" >> /etc/apache2/apache2.conf && \
+    echo "    Allow from all" >> /etc/apache2/apache2.conf && \
+    echo "</LocationMatch>" >> /etc/apache2/apache2.conf
+    
+RUN echo "Header set X-Content-Type-Options \"nosniff\"" >> /etc/apache2/apache2.conf && \
+    echo "Header set X-Frame-Options \"SAMEORIGIN\"" >> /etc/apache2/apache2.conf && \
+    echo "Header set X-XSS-Protection \"1; mode=block\"" >> /etc/apache2/apache2.conf
 
 # Also add this to ensure proper headers
 RUN echo "SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded" >> /etc/apache2/apache2.conf
