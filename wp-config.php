@@ -7,7 +7,7 @@ define('DB_HOST', getenv('MYSQLHOST'));
 define('DB_CHARSET', 'utf8');
 define('DB_COLLATE', '');
 
-$table_prefix = 'wp2_';
+$table_prefix = 'wp_';
 
 // Authentication keys and salts
 define('AUTH_KEY',         getenv('AUTH_KEY'));
