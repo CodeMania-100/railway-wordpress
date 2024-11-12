@@ -8,7 +8,10 @@ RUN echo "memory_limit = 256M" > /usr/local/etc/php/conf.d/wordpress.ini && \
     echo "upload_max_filesize = 64M" >> /usr/local/etc/php/conf.d/wordpress.ini && \
     echo "post_max_size = 64M" >> /usr/local/etc/php/conf.d/wordpress.ini && \
     echo "max_execution_time = 300" >> /usr/local/etc/php/conf.d/wordpress.ini
-
+RUN echo "max_input_vars = 3000" >> /usr/local/etc/php/conf.d/wordpress.ini && \
+    echo "max_input_time = 60" >> /usr/local/etc/php/conf.d/wordpress.ini && \
+    echo "session.gc_maxlifetime = 3600" >> /usr/local/etc/php/conf.d/wordpress.ini
+    
 # Set Apache environment variables
 ENV APACHE_RUN_USER=www-data \
     APACHE_RUN_GROUP=www-data \
@@ -28,6 +31,15 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
     echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
     echo "    Require all granted" >> /etc/apache2/apache2.conf && \
     echo "</Directory>" >> /etc/apache2/apache2.conf
+
+RUN echo "<Directory /var/www/html/wp-admin/>" >> /etc/apache2/apache2.conf && \
+    echo "    Options FollowSymLinks" >> /etc/apache2/apache2.conf && \
+    echo "    AllowOverride All" >> /etc/apache2/apache2.conf && \
+    echo "    Require all granted" >> /etc/apache2/apache2.conf && \
+    echo "</Directory>" >> /etc/apache2/apache2.conf
+
+# Also add this to ensure proper headers
+RUN echo "SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded" >> /etc/apache2/apache2.conf
 
 # Add SSL configuration
 RUN echo "<IfModule mod_ssl.c>" >> /etc/apache2/apache2.conf && \
