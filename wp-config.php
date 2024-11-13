@@ -1,4 +1,7 @@
 <?php
+
+define('NODEJS_SERVER_URL', 'https://railway-deploy-production-80aa.up.railway.app');
+
 // Database settings
 define('DB_NAME', getenv('MYSQL_DATABASE'));
 define('DB_USER', getenv('MYSQLUSER'));
@@ -23,6 +26,7 @@ define('NONCE_SALT',       getenv('NONCE_SALT'));
 define('WP_HOME', 'https://railway-wordpress-production-56c1.up.railway.app');
 define('WP_SITEURL', 'https://railway-wordpress-production-56c1.up.railway.app');
 
+
 // SSL and cookie settings
 define('FORCE_SSL_ADMIN', true);// Leave empty to allow all domains
 define('COOKIEPATH', '/');
@@ -39,9 +43,9 @@ if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 }
 
 // Debug settings
-define('WP_DEBUG', false);
-define('WP_DEBUG_LOG', false);
-define('WP_DEBUG_DISPLAY', false);
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+define('WP_DEBUG_DISPLAY', true);
 
 // Additional settings
 define('FS_METHOD', 'direct');
